@@ -1,13 +1,23 @@
+import {
+  Button,
+  Fade,
+  IconButton,
+  Stack,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import React, { useState, useEffect } from "react";
+import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
+import { Clear, ReportProblemOutlined } from "@mui/icons-material";
 
 const AcademicRecord = ({ userInfo, setUserInfo }) => {
-  const [numPages, setNumPages] = useState(null);
-  const [text, setText] = useState("");
-  const [currentPage, setCurrentPage] = useState(1);
-  const [isProcessing, setIsProcessing] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [isUploaded, setIsUploaded] = useState(false);
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
+    setSelectedFile(file);
     const reader = new FileReader();
 
     reader.onload = async (e) => {
@@ -15,8 +25,6 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
       const pdf = await window.pdfjsLib.getDocument(buffer).promise;
       const totalPages = pdf.numPages;
       let extractedText = "";
-
-      setIsProcessing(true);
 
       const processPageText = async (pageIndex) => {
         const page = await pdf.getPage(pageIndex + 1);
@@ -27,18 +35,16 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
         if (pageIndex + 1 < totalPages) {
           await processPageText(pageIndex + 1);
         } else {
-          setText(extractedText);
           console.log(extractSubjects(extractedText));
-          setIsProcessing(false);
         }
       };
 
       await processPageText(0);
-      setNumPages(totalPages);
-      setCurrentPage(1);
     };
 
     reader.readAsArrayBuffer(file);
+
+    setIsUploaded(true);
   };
 
   const deleteTextSpaces = (text) => {
@@ -114,6 +120,16 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
     }
 
     console.log("Total UC:", totalUC); // Imprimir el total de unidades de crédito
+
+    if (!text.includes("Ingeniería Informática")) {
+      setErrorMessage("No eres estudiante de Ingeniería en informática");
+    }
+
+    if (totalUC < 197)
+      setErrorMessage(
+        "Según tu histórico académico, aún no puedes ver electivas"
+      );
+
     const studentInfo = extractStudentInfo(text);
     console.log("Cédula:", studentInfo.cedula);
     console.log("Nombre:", studentInfo.nombreCompleto);
@@ -126,18 +142,92 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
     return subjects;
   };
 
+  const handleDeleteFile = () => {
+    setSelectedFile(null);
+    setErrorMessage("");
+    setIsUploaded(false);
+  };
+
   return (
     <div>
-      <form>
-        <input type="file" onChange={handleFileChange} />
-      </form>
+      {selectedFile ? (
+        <div
+          style={{
+            width: "100%",
+            display: "inline-flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <div
+            style={{
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              marginRight: "5pt",
+            }}
+          >
+            <Typography variant="inherit">{selectedFile.name}</Typography>
+          </div>
+          <Tooltip title="Eliminar Archivo">
+            <IconButton onClick={handleDeleteFile}>
+              <Clear />
+            </IconButton>
+          </Tooltip>
+        </div>
+      ) : (
+        <label htmlFor={"inputAcademicRecord"}>
+          <input
+            style={{ display: "none" }}
+            id={"inputAcademicRecord"}
+            type="file"
+            onChange={handleFileChange}
+          />
+          <Button
+            variant="outlined"
+            startIcon={<UploadFileOutlinedIcon />}
+            component="span"
+            fullWidth
+          >
+            Cargar histórico académico
+          </Button>
+        </label>
+      )}
       <div>
-        {isProcessing ? (
-          <p>Processing the PDF...</p>
-        ) : (
-          <>
-            <h2>Extracted Text from PDF:</h2>
-          </>
+        {isUploaded && (
+          <Fade in timeout={2000}>
+            <div>
+              {userInfo.name === "" || userInfo.cedula === "" ? (
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  gap={1}
+                  justifyContent={"center"}
+                >
+                  <ReportProblemOutlined color="error" fontSize="small" />
+                  <Typography variant="body2" color={"error"}>
+                    Hubo un problema cargando el histórico académico
+                  </Typography>
+                </Stack>
+              ) : (
+                <>
+                  {errorMessage && (
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      gap={1}
+                      justifyContent={"center"}
+                    >
+                      <ReportProblemOutlined color="error" fontSize="small" />
+                      <Typography variant="body2" color={"error"}>
+                        {errorMessage}
+                      </Typography>
+                    </Stack>
+                  )}
+                </>
+              )}
+            </div>
+          </Fade>
         )}
       </div>
     </div>
