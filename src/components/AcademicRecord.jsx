@@ -17,34 +17,41 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
-    setSelectedFile(file);
-    const reader = new FileReader();
 
-    reader.onload = async (e) => {
-      const buffer = e.target.result;
-      const pdf = await window.pdfjsLib.getDocument(buffer).promise;
-      const totalPages = pdf.numPages;
-      let extractedText = "";
+    if (file && file.type === "application/pdf") {
+      setSelectedFile(file);
+      setErrorMessage("");
 
-      const processPageText = async (pageIndex) => {
-        const page = await pdf.getPage(pageIndex + 1);
-        const pageText = await page.getTextContent();
-        const pageStrings = pageText.items.map((item) => item.str);
-        extractedText += pageStrings.join(" ");
+      const reader = new FileReader();
 
-        if (pageIndex + 1 < totalPages) {
-          await processPageText(pageIndex + 1);
-        } else {
-          console.log(extractSubjects(extractedText));
-        }
+      reader.onload = async (e) => {
+        const buffer = e.target.result;
+        const pdf = await window.pdfjsLib.getDocument(buffer).promise;
+        const totalPages = pdf.numPages;
+        let extractedText = "";
+
+        const processPageText = async (pageIndex) => {
+          const page = await pdf.getPage(pageIndex + 1);
+          const pageText = await page.getTextContent();
+          const pageStrings = pageText.items.map((item) => item.str);
+          extractedText += pageStrings.join(" ");
+
+          if (pageIndex + 1 < totalPages) {
+            await processPageText(pageIndex + 1);
+          } else {
+            console.log(extractSubjects(extractedText));
+          }
+        };
+
+        await processPageText(0);
       };
 
-      await processPageText(0);
-    };
+      reader.readAsArrayBuffer(file);
 
-    reader.readAsArrayBuffer(file);
-
-    setIsUploaded(true);
+      setIsUploaded(true);
+    } else {
+      setErrorMessage("Por favor, selecciona un archivo PDF válido");
+    }
   };
 
   const deleteTextSpaces = (text) => {
@@ -130,6 +137,10 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
         "Según tu histórico académico, aún no puedes ver electivas"
       );
 
+    if (!text.includes("Histórico Académico")) {
+      setErrorMessage("Hubo un error leyendo el histórico académico");
+    }
+
     const studentInfo = extractStudentInfo(text);
     console.log("Cédula:", studentInfo.cedula);
     console.log("Nombre:", studentInfo.nombreCompleto);
@@ -179,6 +190,7 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
         <label htmlFor={"inputAcademicRecord"}>
           <input
             style={{ display: "none" }}
+            accept="application/pdf"
             id={"inputAcademicRecord"}
             type="file"
             onChange={handleFileChange}
@@ -194,10 +206,10 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
         </label>
       )}
       <div>
-        {isUploaded && (
+        {errorMessage && (
           <Fade in timeout={2000}>
             <div>
-              {userInfo.name === "" || userInfo.cedula === "" ? (
+              <>
                 <Stack
                   direction="row"
                   alignItems="center"
@@ -206,26 +218,10 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
                 >
                   <ReportProblemOutlined color="error" fontSize="small" />
                   <Typography variant="body2" color={"error"}>
-                    Hubo un problema cargando el histórico académico
+                    {errorMessage}
                   </Typography>
                 </Stack>
-              ) : (
-                <>
-                  {errorMessage && (
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      gap={1}
-                      justifyContent={"center"}
-                    >
-                      <ReportProblemOutlined color="error" fontSize="small" />
-                      <Typography variant="body2" color={"error"}>
-                        {errorMessage}
-                      </Typography>
-                    </Stack>
-                  )}
-                </>
-              )}
+              </>
             </div>
           </Fade>
         )}
