@@ -12,6 +12,8 @@ import {
   Autocomplete,
   Button,
   FormControl,
+  IconButton,
+  InputAdornment,
   InputLabel,
   MenuItem,
   Select,
@@ -21,11 +23,11 @@ import {
   TextField,
 } from "@mui/material";
 import AcademicRecord from "../components/AcademicRecord";
-import expertiseAreas from "../utils/expertiseAreas";
+import uniqueExpertiseAreas from "../utils/expertiseAreas";
 import { createFilterOptions } from "@mui/material/Autocomplete";
 import AutocompleteTextField from "../components/AutoCompleteTextField";
-import specificInterests from "../utils/specificInterests";
 import uniqueTechnologies from "../utils/technologies";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 
 const filter = createFilterOptions();
 
@@ -34,6 +36,7 @@ const signUpData = {
   cedula: "",
   email: "",
   password: "",
+  linkedin: "",
   level: "Pregrado",
 };
 
@@ -42,6 +45,19 @@ const defaultTheme = createTheme();
 const Signup = () => {
   const [userSignUp, setUserSignUp] = useState(signUpData);
   const [activeStep, setActiveStep] = useState(0);
+  const [valueExpertiseAreas, setValueExpertiseAreas] = useState([]);
+  const [valueTechnologies, setValueTechnologies] = useState([]);
+  const [valueAcademicRecord, setValueAcademicRecord] = useState([]);
+  const [selectedFile, setSelectedFile] = useState();
+  const [showPassword, setShowPassword] = useState(false);
+
+  const handleClickShowPassword = () => {
+    setShowPassword(!showPassword);
+  };
+
+  const handleMouseDownPassword = (e) => {
+    e.preventDefault();
+  };
 
   const handleChangeSignUp = (name, value) => {
     setUserSignUp({ ...userSignUp, [name]: value });
@@ -52,9 +68,27 @@ const Signup = () => {
     "Detalles de Especialización y Preferencias",
   ];
 
-  const handleNext = () => {
+  const handleNext = async () => {
     if (activeStep === steps.length - 1) {
-      console.log(userSignUp);
+      try {
+        const response = await fetch("http://localhost:5000/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: userSignUp.name,
+            cedula: userSignUp.cedula,
+            email: userSignUp.email,
+            password: userSignUp.password,
+          }),
+        });
+
+        const data = await response.json();
+        console.log(data); // Puedes mostrar un mensaje de éxito o redireccionar al usuario a otra página tras el registro exitoso
+      } catch (error) {
+        console.error("Error al registrar usuario:", error);
+      }
     } else {
       setActiveStep(activeStep + 1);
     }
@@ -79,10 +113,6 @@ const Signup = () => {
         return true;
     }
   };
-
-  const [valueExpertiseAreas, setValueExpertiseAreas] = useState([]);
-  const [valueSpecificInterests, setValueSpecificInterests] = useState([]);
-  const [valueTechnologies, setValueTechnologies] = useState([]);
 
   return (
     <ThemeProvider theme={defaultTheme}>
@@ -142,6 +172,9 @@ const Signup = () => {
                         <AcademicRecord
                           setUserInfo={setUserSignUp}
                           userInfo={userSignUp}
+                          setAcademicRecord={setValueAcademicRecord}
+                          selectedFile={selectedFile}
+                          setSelectedFile={setSelectedFile}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -173,6 +206,19 @@ const Signup = () => {
                       </Grid>
                       <Grid item xs={12}>
                         <TextField
+                          fullWidth
+                          id="linkedin"
+                          label="URL de LinkedIn"
+                          name="linkedin"
+                          autoComplete="linkedin"
+                          onChange={(e) =>
+                            handleChangeSignUp("linkedin", e.target.value)
+                          }
+                          value={userSignUp.linkedin}
+                        />
+                      </Grid>
+                      <Grid item xs={12}>
+                        <TextField
                           required
                           fullWidth
                           id="email"
@@ -193,7 +239,25 @@ const Signup = () => {
                           label="Contraseña"
                           name="password"
                           autoComplete="password"
-                          type="password"
+                          type={showPassword ? "text" : "password"}
+                          InputProps={{
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  aria-label="cambiar visibilidad de la contraseña"
+                                  onClick={handleClickShowPassword}
+                                  onMouseDown={handleMouseDownPassword}
+                                  edge="end"
+                                >
+                                  {showPassword ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }}
                           onChange={(e) =>
                             handleChangeSignUp("password", e.target.value)
                           }
@@ -209,9 +273,19 @@ const Signup = () => {
                         <AutocompleteTextField
                           value={valueExpertiseAreas}
                           setValue={setValueExpertiseAreas}
-                          array={expertiseAreas}
+                          array={uniqueExpertiseAreas}
                           label={"Áreas de especialización"}
                         />
+                      </Grid>
+                      <Grid item xs={12} mt={"-12px"}>
+                        <Typography
+                          variant="body2"
+                          color={"GrayText"}
+                          textAlign={"center"}
+                        >
+                          Selecciona también las áreas de especialización que te
+                          interesan.
+                        </Typography>
                       </Grid>
                       <Grid item xs={12}>
                         <FormControl fullWidth>
@@ -234,14 +308,6 @@ const Signup = () => {
                             </MenuItem>
                           </Select>
                         </FormControl>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <AutocompleteTextField
-                          value={valueSpecificInterests}
-                          setValue={setValueSpecificInterests}
-                          array={specificInterests}
-                          label={"Intereses específicos"}
-                        />
                       </Grid>
                       <Grid item xs={12}>
                         <AutocompleteTextField

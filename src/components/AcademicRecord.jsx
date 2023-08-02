@@ -10,8 +10,13 @@ import React, { useState, useEffect } from "react";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
 import { Clear, ReportProblemOutlined } from "@mui/icons-material";
 
-const AcademicRecord = ({ userInfo, setUserInfo }) => {
-  const [selectedFile, setSelectedFile] = useState(null);
+const AcademicRecord = ({
+  userInfo,
+  setUserInfo,
+  setAcademicRecord,
+  selectedFile,
+  setSelectedFile,
+}) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isUploaded, setIsUploaded] = useState(false);
 
@@ -39,7 +44,7 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
           if (pageIndex + 1 < totalPages) {
             await processPageText(pageIndex + 1);
           } else {
-            console.log(extractSubjects(extractedText));
+            setAcademicRecord(extractSubjects(extractedText));
           }
         };
 
@@ -157,6 +162,7 @@ const AcademicRecord = ({ userInfo, setUserInfo }) => {
     setSelectedFile(null);
     setErrorMessage("");
     setIsUploaded(false);
+    setAcademicRecord([]);
   };
 
   return (
