@@ -37,7 +37,7 @@ const signUpData = {
   email: "",
   password: "",
   linkedin: "",
-  level: "Pregrado",
+  level: 1,
 };
 
 const defaultTheme = createTheme();
@@ -81,6 +81,7 @@ const Signup = () => {
             cedula: userSignUp.cedula,
             email: userSignUp.email,
             password: userSignUp.password,
+            level_id: userSignUp.level,
           }),
         });
 
@@ -301,11 +302,9 @@ const Signup = () => {
                               handleChangeSignUp("level", e.target.value)
                             }
                           >
-                            <MenuItem value={"Pregrado"}>Pregrado</MenuItem>
-                            <MenuItem value={"Postgrado"}>Postgrado</MenuItem>
-                            <MenuItem value={"Formación Continua"}>
-                              Formación Continua
-                            </MenuItem>
+                            <MenuItem value={1}>Pregrado</MenuItem>
+                            <MenuItem value={2}>Postgrado</MenuItem>
+                            <MenuItem value={3}>Formación Continua</MenuItem>
                           </Select>
                         </FormControl>
                       </Grid>
