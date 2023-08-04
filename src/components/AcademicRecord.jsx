@@ -8,17 +8,12 @@ import {
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import UploadFileOutlinedIcon from "@mui/icons-material/UploadFileOutlined";
-import { Clear, ReportProblemOutlined } from "@mui/icons-material";
+import { Clear, ReportProblemOutlined, UploadFile } from "@mui/icons-material";
 
-const AcademicRecord = ({
-  userInfo,
-  setUserInfo,
-  setAcademicRecord,
-  selectedFile,
-  setSelectedFile,
-}) => {
+const AcademicRecord = ({ userInfo, setUserInfo, setAcademicRecord }) => {
   const [errorMessage, setErrorMessage] = useState("");
   const [isUploaded, setIsUploaded] = useState(false);
+  const [selectedFile, setSelectedFile] = useState();
 
   const handleFileChange = async (event) => {
     const file = event.target.files[0];
@@ -203,7 +198,7 @@ const AcademicRecord = ({
           />
           <Button
             variant="outlined"
-            startIcon={<UploadFileOutlinedIcon />}
+            startIcon={<UploadFile />}
             component="span"
             fullWidth
           >

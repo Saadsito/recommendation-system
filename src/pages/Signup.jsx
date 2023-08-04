@@ -24,19 +24,16 @@ import {
 } from "@mui/material";
 import AcademicRecord from "../components/AcademicRecord";
 import uniqueExpertiseAreas from "../utils/expertiseAreas";
-import { createFilterOptions } from "@mui/material/Autocomplete";
 import AutocompleteTextField from "../components/AutoCompleteTextField";
 import uniqueTechnologies from "../utils/technologies";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
-
-const filter = createFilterOptions();
+import Linkedin from "../components/Linkedin";
 
 const signUpData = {
   name: "",
   cedula: "",
   email: "",
   password: "",
-  linkedin: "",
   level: 1,
 };
 
@@ -48,7 +45,6 @@ const Signup = () => {
   const [valueExpertiseAreas, setValueExpertiseAreas] = useState([]);
   const [valueTechnologies, setValueTechnologies] = useState([]);
   const [valueAcademicRecord, setValueAcademicRecord] = useState([]);
-  const [selectedFile, setSelectedFile] = useState();
   const [showPassword, setShowPassword] = useState(false);
 
   const handleClickShowPassword = () => {
@@ -70,26 +66,30 @@ const Signup = () => {
 
   const handleNext = async () => {
     if (activeStep === steps.length - 1) {
-      try {
-        const response = await fetch("http://localhost:5000/signup", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: userSignUp.name,
-            cedula: userSignUp.cedula,
-            email: userSignUp.email,
-            password: userSignUp.password,
-            level_id: userSignUp.level,
-          }),
-        });
+      // try {
+      //   const response = await fetch("http://localhost:5000/signup", {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       name: userSignUp.name,
+      //       cedula: userSignUp.cedula,
+      //       email: userSignUp.email,
+      //       password: userSignUp.password,
+      //       level_id: userSignUp.level,
+      //     }),
+      //   });
 
-        const data = await response.json();
-        console.log(data); // Puedes mostrar un mensaje de éxito o redireccionar al usuario a otra página tras el registro exitoso
-      } catch (error) {
-        console.error("Error al registrar usuario:", error);
-      }
+      //   const data = await response.json();
+      //   console.log(data); // Puedes mostrar un mensaje de éxito o redireccionar al usuario a otra página tras el registro exitoso
+      // } catch (error) {
+      //   console.error("Error al registrar usuario:", error);
+      // }
+      console.log(userSignUp);
+      console.log(valueAcademicRecord);
+      console.log(valueTechnologies);
+      console.log(valueExpertiseAreas);
     } else {
       setActiveStep(activeStep + 1);
     }
@@ -174,8 +174,6 @@ const Signup = () => {
                           setUserInfo={setUserSignUp}
                           userInfo={userSignUp}
                           setAcademicRecord={setValueAcademicRecord}
-                          selectedFile={selectedFile}
-                          setSelectedFile={setSelectedFile}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -203,19 +201,6 @@ const Signup = () => {
                             handleChangeSignUp("cedula", e.target.value)
                           }
                           value={userSignUp.cedula}
-                        />
-                      </Grid>
-                      <Grid item xs={12}>
-                        <TextField
-                          fullWidth
-                          id="linkedin"
-                          label="URL de LinkedIn"
-                          name="linkedin"
-                          autoComplete="linkedin"
-                          onChange={(e) =>
-                            handleChangeSignUp("linkedin", e.target.value)
-                          }
-                          value={userSignUp.linkedin}
                         />
                       </Grid>
                       <Grid item xs={12}>
@@ -270,6 +255,14 @@ const Signup = () => {
                 ) : (
                   <Box sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
+                      <Grid item xs={12}>
+                        <Linkedin
+                          valueExpertiseAreas={valueExpertiseAreas}
+                          setValueExpertiseAreas={setValueExpertiseAreas}
+                          valueTechnologies={valueTechnologies}
+                          setValueTechnologies={setValueTechnologies}
+                        />
+                      </Grid>
                       <Grid item xs={12}>
                         <AutocompleteTextField
                           value={valueExpertiseAreas}

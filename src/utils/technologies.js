@@ -10,7 +10,7 @@ const technologies = [
   "Kotlin",
   "TypeScript",
   "HTML/CSS",
-  "React",
+  "React.js",
   "Angular",
   "Vue.js",
   "Node.js",
