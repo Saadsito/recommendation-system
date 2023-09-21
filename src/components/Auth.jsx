@@ -1,10 +1,9 @@
 import { Navigate } from "react-router-dom";
-import { useUser } from "../hooks/useUser";
 
 const Auth = ({ children }) => {
-  const user = useUser();
+  const accessToken = localStorage.getItem("access_token");
 
-  if (!user) {
+  if (!accessToken) {
     return <Navigate to="/login" replace />;
   }
 

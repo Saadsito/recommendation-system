@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import CssBaseline from "@mui/material/CssBaseline";
 import Link from "../components/Link";
 import Grid from "@mui/material/Grid";
@@ -9,7 +9,6 @@ import { createTheme, ThemeProvider } from "@mui/material/styles";
 import { useSnackbar } from "notistack";
 import { LoadingButton } from "@mui/lab";
 import {
-  Autocomplete,
   Button,
   FormControl,
   IconButton,
@@ -22,7 +21,6 @@ import {
   Stepper,
   TextField,
 } from "@mui/material";
-import AcademicRecord from "../components/AcademicRecord";
 import uniqueExpertiseAreas from "../utils/expertiseAreas";
 import AutocompleteTextField from "../components/AutoCompleteTextField";
 import uniqueTechnologies from "../utils/technologies";
@@ -44,8 +42,9 @@ const Signup = () => {
   const [activeStep, setActiveStep] = useState(0);
   const [valueExpertiseAreas, setValueExpertiseAreas] = useState([]);
   const [valueTechnologies, setValueTechnologies] = useState([]);
-  const [valueAcademicRecord, setValueAcademicRecord] = useState([]);
   const [showPassword, setShowPassword] = useState(false);
+
+  const { enqueueSnackbar } = useSnackbar();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -66,30 +65,38 @@ const Signup = () => {
 
   const handleNext = async () => {
     if (activeStep === steps.length - 1) {
-      // try {
-      //   const response = await fetch("http://localhost:5000/signup", {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       name: userSignUp.name,
-      //       cedula: userSignUp.cedula,
-      //       email: userSignUp.email,
-      //       password: userSignUp.password,
-      //       level_id: userSignUp.level,
-      //     }),
-      //   });
+      try {
+        const response = await fetch("http://localhost:5000/signup", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: userSignUp.name,
+            id_card: userSignUp.cedula,
+            email: userSignUp.email,
+            password: userSignUp.password,
+            level_id: userSignUp.level,
+            skills: valueTechnologies,
+            specializations: valueExpertiseAreas,
+          }),
+        });
 
-      //   const data = await response.json();
-      //   console.log(data); // Puedes mostrar un mensaje de éxito o redireccionar al usuario a otra página tras el registro exitoso
-      // } catch (error) {
-      //   console.error("Error al registrar usuario:", error);
-      // }
-      console.log(userSignUp);
-      console.log(valueAcademicRecord);
-      console.log(valueTechnologies);
-      console.log(valueExpertiseAreas);
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || "Error en la solicitud");
+        }
+
+        return enqueueSnackbar("Usuario registrado correctamente", {
+          variant: "success",
+        });
+      } catch (error) {
+        console.error(error.message);
+        enqueueSnackbar(`Error al registrar al usuario: ${error.message}`, {
+          variant: "error",
+        });
+      }
     } else {
       setActiveStep(activeStep + 1);
     }
@@ -169,13 +176,6 @@ const Signup = () => {
                 {activeStep === 0 ? (
                   <Box sx={{ mt: 3 }}>
                     <Grid container spacing={2}>
-                      <Grid item xs={12}>
-                        <AcademicRecord
-                          setUserInfo={setUserSignUp}
-                          userInfo={userSignUp}
-                          setAcademicRecord={setValueAcademicRecord}
-                        />
-                      </Grid>
                       <Grid item xs={12}>
                         <TextField
                           autoComplete="given-name"
@@ -306,8 +306,17 @@ const Signup = () => {
                           value={valueTechnologies}
                           setValue={setValueTechnologies}
                           array={uniqueTechnologies}
-                          label={"Tecnologías preferidas"}
+                          label={"Habilidades"}
                         />
+                      </Grid>
+                      <Grid item xs={12} mt={"-12px"}>
+                        <Typography
+                          variant="body2"
+                          color={"GrayText"}
+                          textAlign={"center"}
+                        >
+                          Selecciona también las habilidades que te interesan.
+                        </Typography>
                       </Grid>
                     </Grid>
                   </Box>
