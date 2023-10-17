@@ -8,6 +8,7 @@ import SignupLinkedin from "./pages/SignupLinkedin";
 import UnAuth from "./components/UnAuth";
 import Auth from "./components/Auth";
 import { UserProvider } from "./hooks/useUser";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
           }
         >
           <Route path="/home" element={<Home />} />
+          <Route path="/profile" element={<Profile />} />
         </Route>
       </Routes>
     </UserProvider>

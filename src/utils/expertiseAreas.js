@@ -15,7 +15,6 @@ const expertiseAreas = [
   "Criptografía",
   "Robótica",
   "Computación móvil",
-  "Big Data",
   "Gestión de proyectos de TI",
   "Sistemas embebidos",
   "Computación cuántica",

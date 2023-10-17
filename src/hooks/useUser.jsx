@@ -17,6 +17,8 @@ const UserProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("access_token");
 
+    console.log(token);
+
     if (token) {
       // Si hay un token en localStorage, verifica la autenticación
       fetchUser();
@@ -30,7 +32,7 @@ const UserProvider = ({ children }) => {
       const response = await fetch("http://localhost:5000/get_user", {
         method: "GET",
         headers: {
-          Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+          Authorization: `${localStorage.getItem("access_token")}`,
           "Content-Type": "application/json",
         },
       });

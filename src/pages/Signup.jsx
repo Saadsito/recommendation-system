@@ -322,7 +322,7 @@ const Signup = () => {
                   </Box>
                 )}
               </div>
-              <Grid container spacing={2} sx={{ mt: 0, mb: 2 }}>
+              <Grid container spacing={2} sx={{ mt: 0, mb: 2, ml: 0 }}>
                 <Grid item xs={12} sm={6}>
                   <Button
                     fullWidth

@@ -41,7 +41,6 @@ const technologies = [
   "RESTful API",
   "Blockchain",
   "IoT",
-  "Big Data",
   "Machine Learning",
   "Inteligencia Artificial",
   "Realidad Virtual",
