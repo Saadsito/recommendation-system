@@ -14,10 +14,13 @@ import Header from "../components/Header";
 import AutocompleteTextField from "../components/AutoCompleteTextField";
 import uniqueExpertiseAreas from "../utils/expertiseAreas";
 import uniqueTechnologies from "../utils/technologies";
+import { useUser } from "../hooks/useUser";
 
 const Profile = () => {
   const [valueExpertiseAreas, setValueExpertiseAreas] = useState([]);
   const [valueTechnologies, setValueTechnologies] = useState([]);
+
+  const user = useUser();
 
   return (
     <Box>
@@ -31,6 +34,7 @@ const Profile = () => {
             alignItems: "center",
           }}
         >
+          {console.log(user)}
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <AutocompleteTextField

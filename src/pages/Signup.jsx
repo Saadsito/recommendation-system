@@ -26,6 +26,7 @@ import AutocompleteTextField from "../components/AutoCompleteTextField";
 import uniqueTechnologies from "../utils/technologies";
 import { Visibility, VisibilityOff } from "@mui/icons-material";
 import Linkedin from "../components/Linkedin";
+import { useNavigate } from "react-router-dom";
 
 const signUpData = {
   name: "",
@@ -45,6 +46,8 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   const { enqueueSnackbar } = useSnackbar();
+
+  const navigate = useNavigate();
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -88,9 +91,37 @@ const Signup = () => {
           throw new Error(data.error || "Error en la solicitud");
         }
 
-        return enqueueSnackbar("Usuario registrado correctamente", {
-          variant: "success",
+        // Iniciar sesión automáticamente después del registro
+        const loginResponse = await fetch("http://localhost:5000/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email: userSignUp.email, // Utiliza el correo del usuario registrado
+            password: userSignUp.password, // Utiliza la contraseña del usuario registrado
+          }),
         });
+
+        const loginData = await loginResponse.json();
+
+        if (loginResponse.ok) {
+          localStorage.setItem("access_token", loginData.access_token);
+
+          enqueueSnackbar(
+            "Usuario registrado y ha iniciado sesión correctamente",
+            {
+              variant: "success",
+            }
+          );
+
+          // Redirige al usuario a la página "/home"
+          navigate("/home");
+        } else {
+          enqueueSnackbar(loginData.message || "Error en el inicio de sesión", {
+            variant: "error",
+          });
+        }
       } catch (error) {
         console.error(error.message);
         enqueueSnackbar(`Error al registrar al usuario: ${error.message}`, {

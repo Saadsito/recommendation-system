@@ -35,15 +35,11 @@ const Filter = ({
   setValueFilterCareers,
   valueFilterLevel,
   setValueFilterLevel,
-  valueFilterBeginDate,
-  setValueFilterBeginDate,
-  valueFilterEndDate,
-  setValueFilterEndDate,
+  valueFilterFavorites,
+  setValueFilterFavorites,
 }) => {
   const [universities, setUniversities] = useState([]);
   const [careers, setCareers] = useState([]);
-  const [variantFavoriteButton, setVariantFavoriteButton] =
-    useState("outlined");
 
   useEffect(() => {
     // Realiza la solicitud HTTP al servidor Flask
@@ -86,14 +82,10 @@ const Filter = ({
     setValueFilterCareers([]);
     setValueFilterUniversities([]);
     setValueFilterLevel(0);
-    setValueFilterBeginDate(null);
-    setValueFilterEndDate(null);
   };
 
   const handleShowFavorites = () => {
-    if (variantFavoriteButton === "outlined")
-      setVariantFavoriteButton("contained");
-    else setVariantFavoriteButton("outlined");
+    setValueFilterFavorites(!valueFilterFavorites);
   };
 
   return (
@@ -157,67 +149,17 @@ const Filter = ({
         <Grid item xs={12}>
           <Button
             fullWidth
-            variant={variantFavoriteButton}
+            variant={valueFilterFavorites ? "contained" : "outlined"}
             disableElevation
             onClick={handleShowFavorites}
             color="secondary"
-            endIcon={
-              variantFavoriteButton === "outlined" ? (
-                <FavoriteBorder />
-              ) : (
-                <Favorite />
-              )
-            }
+            endIcon={!valueFilterFavorites ? <FavoriteBorder /> : <Favorite />}
           >
             Mostrar favoritos
           </Button>
         </Grid>
         <Grid item xs={12}>
           <Divider />
-        </Grid>
-        <Grid item xs={12}>
-          <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="es">
-            <DemoContainer components={["DatePicker"]}>
-              <Grid item xs={15}>
-                <DatePicker
-                  label="Desde"
-                  value={valueFilterBeginDate} // Asegúrate de que valueFilterBeginDate sea un objeto de fecha válido
-                  minDate={dayjs()} // Establece la fecha mínima como el día actual
-                  onChange={(newValue) => {
-                    // Lógica para asegurar que la fecha seleccionada en "Desde" no sea menor a la fecha seleccionada en "Hasta"
-                    if (
-                      valueFilterEndDate &&
-                      newValue.isBefore(valueFilterEndDate)
-                    ) {
-                      setValueFilterBeginDate(newValue.toDate());
-                    } else if (!valueFilterEndDate) {
-                      setValueFilterBeginDate(newValue.toDate());
-                    }
-                  }}
-                />
-              </Grid>
-              <Grid item xs={15}>
-                <DatePicker
-                  label="Hasta"
-                  value={valueFilterEndDate} // Asegúrate de que valueFilterEndDate sea un objeto de fecha válido
-                  minDate={
-                    valueFilterBeginDate ? dayjs(valueFilterBeginDate) : dayjs()
-                  } // Establece la fecha mínima como el valor seleccionado en el DatePicker "Desde" o el día actual si "Desde" no tiene fecha seleccionada
-                  onChange={(newValue) => {
-                    // Lógica para asegurar que la fecha seleccionada en "Hasta" no sea menor a la fecha seleccionada en "Desde"
-                    if (
-                      valueFilterBeginDate &&
-                      newValue.isAfter(valueFilterBeginDate)
-                    ) {
-                      setValueFilterEndDate(newValue.toDate());
-                    } else if (!valueFilterBeginDate) {
-                      setValueFilterEndDate(newValue.toDate());
-                    }
-                  }}
-                />
-              </Grid>
-            </DemoContainer>
-          </LocalizationProvider>
         </Grid>
         <Grid item xs={12}>
           <AutocompleteFilter
@@ -263,9 +205,7 @@ const Filter = ({
               !searchCourse &&
               !valueFilterUniversities.length &&
               !valueFilterCareers.length &&
-              !valueFilterLevel &&
-              !valueFilterBeginDate &&
-              !valueFilterEndDate
+              !valueFilterLevel
             }
             onClick={handleDeleteFilters}
           >

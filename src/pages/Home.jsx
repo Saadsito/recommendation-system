@@ -11,8 +11,7 @@ const Home = () => {
   const [valueFilterUniversities, setValueFilterUniversities] = useState([]);
   const [valueFilterCareers, setValueFilterCareers] = useState([]);
   const [valueFilterLevel, setValueFilterLevel] = useState(0);
-  const [valueFilterBeginDate, setValueFilterBeginDate] = useState(null);
-  const [valueFilterEndDate, setValueFilterEndDate] = useState(null);
+  const [valueFilterFavorites, setValueFilterFavorites] = useState(false);
 
   const [courses, setCourses] = useState([]);
 
@@ -60,10 +59,8 @@ const Home = () => {
           setValueFilterCareers={setValueFilterCareers}
           valueFilterLevel={valueFilterLevel}
           setValueFilterLevel={setValueFilterLevel}
-          valueFilterBeginDate={valueFilterBeginDate}
-          setValueFilterBeginDate={setValueFilterBeginDate}
-          valueFilterEndDate={valueFilterEndDate}
-          setValueFilterEndDate={setValueFilterEndDate}
+          valueFilterFavorites={valueFilterFavorites}
+          setValueFilterFavorites={setValueFilterFavorites}
         />
         <Box
           flexGrow={1}
@@ -76,20 +73,42 @@ const Home = () => {
           }}
         >
           {courses.length !== 0 ? (
-            courses.map((course) => (
-              <Masonry
-                columns={1}
-                spacing={1}
-                sx={{ width: "auto", margin: "5px" }}
-              >
+            courses
+              .filter((data) => {
+                if (searchCourse === "") {
+                  return data;
+                } else if (
+                  data.title.toLowerCase().includes(searchCourse.toLowerCase())
+                ) {
+                  return data;
+                }
+              })
+              .filter((data) => {
+                // Filtrar por las carreras seleccionadas solo si hay carreras seleccionadas
+                if (valueFilterCareers.length === 0) {
+                  return true;
+                } else if (valueFilterCareers.includes(data.career)) {
+                  return true;
+                }
+                return false;
+              })
+              .filter((data) => {
+                // Filtrar por las carreras seleccionadas solo si hay carreras seleccionadas
+                if (!valueFilterFavorites) {
+                  return true;
+                }
+                return data.like;
+              })
+              .map((course) => (
                 <div key={course.id + ""}>
-                  <CardCourse
-                    course={course}
-                    setCourseDescription={setCourseDescription}
-                  />
+                  <Box spacing={1} sx={{ width: "auto", margin: "5px" }}>
+                    <CardCourse
+                      course={course}
+                      setCourseDescription={setCourseDescription}
+                    />
+                  </Box>
                 </div>
-              </Masonry>
-            ))
+              ))
           ) : (
             <>
               <Box
