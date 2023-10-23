@@ -50,15 +50,19 @@ const CourseDescription = ({ courseDescription }) => {
             <Typography variant="body2" color="primary">
               Fecha
             </Typography>
-            <Typography variant="body2">Desde: 04/10/2023</Typography>
-            <Typography variant="body2">Hasta: 21/11/2023</Typography>
+            <Typography variant="body2">
+              Desde: {courseDescription.begin_date}
+            </Typography>
+            <Typography variant="body2">
+              Hasta: {courseDescription.end_date}
+            </Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="body2" color="primary">
               Universidad
             </Typography>
             <Typography variant="body2">
-              Universidad Catolica Andres Bello
+              {courseDescription.university}
             </Typography>
           </Grid>
           <Grid item xs={12}>
@@ -71,7 +75,7 @@ const CourseDescription = ({ courseDescription }) => {
             <Typography variant="body2" color="primary">
               Nivel de estudios
             </Typography>
-            <Typography variant="body2">Pregrado</Typography>
+            <Typography variant="body2">{courseDescription.level}</Typography>
           </Grid>
           <Grid item xs={12}>
             <Typography variant="body2" color="primary">
@@ -79,12 +83,10 @@ const CourseDescription = ({ courseDescription }) => {
             </Typography>
             <Link
               target="_blank"
-              href="https://emovies.oui-iohe.org/nuestros-cursos/analisis-instrumental/"
+              href={courseDescription.url}
               color="secondary"
             >
-              <Typography variant="body2">
-                https://emovies.oui-iohe.org/nuestros-cursos/analisis-instrumental/
-              </Typography>
+              <Typography variant="body2">{courseDescription.url}</Typography>
             </Link>
           </Grid>
           <Grid item xs={12}>

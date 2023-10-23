@@ -46,13 +46,10 @@ const CardCourse = ({ course, setCourseDescription }) => {
   return (
     <Card sx={{ minWidth: 200 }}>
       <CardActionArea onClick={() => setCourseDescription(course)}>
-        <CardHeader
-          title={course.title}
-          subheader="Universidad Catolica Andres Bello"
-        />
+        <CardHeader title={course.title} subheader={course.university} />
         <CardContent>
           <Typography variant="body2" color="text.secondary">
-            Desde: 04/10/2023 - Hasta: 21/11/2023
+            Desde: {course.begin_date} - Hasta: {course.end_date}
           </Typography>
           <Typography variant="body2" color="text.secondary">
             Carrera: {course.career}

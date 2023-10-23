@@ -5,6 +5,7 @@ import { Box, CircularProgress, Typography } from "@mui/material";
 import CourseDescription from "../components/CourseDescription";
 import CardCourse from "../components/CardCourse";
 import { Masonry } from "@mui/lab";
+import { useCoursesContext } from "../hooks/useCourses";
 
 const Home = () => {
   const [searchCourse, setSearchCourse] = useState("");
@@ -12,39 +13,9 @@ const Home = () => {
   const [valueFilterCareers, setValueFilterCareers] = useState([]);
   const [valueFilterLevel, setValueFilterLevel] = useState(0);
   const [valueFilterFavorites, setValueFilterFavorites] = useState(false);
-
-  const [courses, setCourses] = useState([]);
-
   const [courseDescription, setCourseDescription] = useState(null);
 
-  const token = localStorage.getItem("access_token");
-
-  useEffect(() => {
-    const fetchCourses = async () => {
-      try {
-        const response = await fetch("http://localhost:5000/recommendation", {
-          method: "GET",
-          headers: {
-            Authorization: token,
-            "Content-Type": "application/json",
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setCourses(data.data);
-        } else {
-          console.error("Error al obtener los cursos:", response.statusText);
-        }
-      } catch (error) {
-        console.error("Error al obtener los cursos:", error);
-      }
-    };
-
-    if (token) {
-      fetchCourses();
-    }
-  }, [token]);
+  const { courses } = useCoursesContext();
 
   return (
     <Box>
@@ -93,11 +64,35 @@ const Home = () => {
                 return false;
               })
               .filter((data) => {
+                // Filtrar por las universidades seleccionadas solo si hay universidades seleccionadas
+                if (valueFilterUniversities.length === 0) {
+                  return true;
+                } else if (valueFilterUniversities.includes(data.university)) {
+                  return true;
+                }
+                return false;
+              })
+              .filter((data) => {
                 // Filtrar por las carreras seleccionadas solo si hay carreras seleccionadas
                 if (!valueFilterFavorites) {
                   return true;
                 }
                 return data.like;
+              })
+              .filter((data) => {
+                // Filtrar por nivel
+                switch (valueFilterLevel) {
+                  case 0:
+                    return true;
+                  case 1:
+                    return data.level === "pregrado";
+                  case 2:
+                    return data.level === "posgrado";
+                  case 3:
+                    return data.level === "formacion continua";
+                  default:
+                    return true;
+                }
               })
               .map((course) => (
                 <div key={course.id + ""}>

@@ -327,7 +327,7 @@ const Signup = () => {
                             }
                           >
                             <MenuItem value={1}>Pregrado</MenuItem>
-                            <MenuItem value={2}>Postgrado</MenuItem>
+                            <MenuItem value={2}>Posgrado</MenuItem>
                             <MenuItem value={3}>Formación Continua</MenuItem>
                           </Select>
                         </FormControl>
